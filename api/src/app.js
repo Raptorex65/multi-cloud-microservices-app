@@ -7,6 +7,7 @@ app.get("/", (req, res) => {
   res.json({
     service: "api",
     status: "ok",
+    environment: process.env.APP_ENV || "local",
     message: "Hello from the API service"
   });
 });
