@@ -1,0 +1,10 @@
+{
+  "name": "worker-service",
+  "version": "1.0.0",
+  "description": "Minimal worker service for multi-cloud platform project",
+  "main": "worker.js",
+  "scripts": {
+    "start": "node worker.js"
+  },
+  "dependencies": {}
+}
