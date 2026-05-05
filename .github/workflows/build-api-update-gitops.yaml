@@ -1,0 +1,68 @@
+name: Build API and update GitOps
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "api/**"
+
+permissions:
+  contents: write
+
+env:
+  AWS_REGION: eu-west-1
+  ECR_REGISTRY: 075897120159.dkr.ecr.eu-west-1.amazonaws.com
+  ECR_REPOSITORY: multi-cloud/api
+  GITOPS_REPO: Raptorex65/multi-cloud-platform-gitops
+  GITOPS_VALUES_FILE: helm/api/values-dev.yaml
+
+jobs:
+  build-and-update-gitops:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout app repository
+        uses: actions/checkout@v4
+
+      - name: Set image tag
+        run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          # Option A: recommended OIDC role
+          role-to-assume: arn:aws:iam::075897120159:role/github-actions-ecr-role
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push API image
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./api
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Checkout GitOps repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.GITOPS_REPO }}
+          token: ${{ secrets.GITOPS_PAT }}
+          path: gitops
+
+      - name: Install yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Update API image tag in GitOps repo
+        working-directory: gitops
+        run: |
+          yq -i '.image.tag = strenv(IMAGE_TAG)' $GITOPS_VALUES_FILE
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add $GITOPS_VALUES_FILE
+          git commit -m "Update API image tag to $IMAGE_TAG" || echo "No changes to commit"
+          git push
