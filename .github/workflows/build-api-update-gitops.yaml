@@ -16,6 +16,7 @@ env:
   ECR_REPOSITORY: multi-cloud/api
   GITOPS_REPO: Raptorex65/multi-cloud-platform-gitops
   GITOPS_VALUES_FILE: helm/api/values-dev.yaml
+  GITOPS_PAT: multi-cloud-platform-gitops
 
 jobs:
   build-and-update-gitops:
@@ -24,7 +25,7 @@ jobs:
     permissions:
       id-token: write
       contents: write    
-      
+
     steps:
       - name: Checkout app repository
         uses: actions/checkout@v4
