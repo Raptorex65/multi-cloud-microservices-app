@@ -23,7 +23,7 @@ app.get("/api", (req, res) => {
     service: "api",
     status: "ok",
     environment: process.env.APP_ENV || "local",
-    message: "Hello from the API service via /api"
+    message: "Hello from the API service v2 via /api"
   });
 });
 
