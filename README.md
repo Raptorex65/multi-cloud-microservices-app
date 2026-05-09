@@ -1,42 +1,90 @@
+# Multi-Cloud Microservices App
+
 ## Project Structure
-
 This platform is split into two repositories:
-
 - multi-cloud-platform-app  
   → application services, Docker images, CI pipelines
-
 - multi-cloud-platform-gitops  
   → infrastructure, Kubernetes manifests, GitOps, and environment management
 
-# Multi-Cloud Microservices App
+This repository contains the **application layer** of the platform.
 
-This repository contains the application source code for a multi-cloud GitOps platform project.
+It is responsible for:
+- service source code
+- Docker images
+- CI pipeline (build + push + GitOps update)
 
-## Components
+## 🧩 Services
 
-- frontend: minimal static UI
-- api: minimal HTTP API
-- worker: minimal background worker
+- frontend → UI
+- api → backend service
+- worker → background processor
 
-## Current Sprint
+- **frontend**
+  - simple UI
+  - exposed via ingress `/`
 
-Sprint 0:
-- repository bootstrap
-- local Docker build
-- local docker-compose validation
-- image push to AWS ECR
+- **api**
+  - REST API
+  - endpoints:
+    - `/`
+    - `/health`
 
-## Local Run
+- **worker**
+  - background processing service
 
+
+This repo does **NOT deploy anything directly**.
+
+Instead:
+
+```text
+CI builds → pushes image → updates GitOps repo
+```
+
+Deployment is handled by Argo CD in the platform repo.
+
+## ⚙️ Tech Stack
+```text
+Node.js
+Docker
+Docker Compose (local)
+Amazon ECR
+```
+
+## 🧪 Local Development
 ```bash
 docker compose up --build
+```
 
-Frontend:
+Access:
+```text
+Frontend: http://localhost:8081
+API:      http://localhost:8080
+Health:   http://localhost:8080/health
+```
 
-http://localhost:8081
+## 🚀 CI/CD Pipeline
+On push to main:
 
-API:
+1. Build Docker image
+2. Tag image with Git SHA
+3. Push to ECR
+4. Update GitOps repo (values.yaml)
+5. Argo CD deploys automatically
 
-http://localhost:8080
-http://localhost:8080/health
+
+## 🧠 Image Strategy
+We use immutable tagging. For the pruposes of:
+  - reproducible deployments
+  - easy rollback
+  - traceable versions
+
+```text
+image: <repo>:<git-sha>
+```
+Example:
+```text
+multi-cloud/api:3c6bbd3
+```
 
