@@ -11,3 +11,5 @@ setInterval(() => {
     })
   );
 }, 5000);
+
+// CI builds with image tagging with github_sha
