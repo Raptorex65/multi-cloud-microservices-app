@@ -29,7 +29,7 @@ app.get("/api", (req, res) => {
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({
-    status: "healthy"
+    status: "api/health healthy"
   });
 });
 
