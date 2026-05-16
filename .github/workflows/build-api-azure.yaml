@@ -1,0 +1,59 @@
+name: Build API for Azure and update GitOps
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "api/**"
+      - ".github/workflows/build-api-azure.yml"
+
+jobs:
+  build-and-update-gitops:
+    runs-on: ubuntu-latest
+
+    env:
+      ACR_NAME: multicloudplatformazuredevacr
+      ACR_LOGIN_SERVER: multicloudplatformazuredevacr.azurecr.io
+      IMAGE_REPOSITORY: multi-cloud/api
+      GITOPS_REPO: Raptorex65/multi-cloud-platform-gitops
+      GITOPS_VALUES_FILE: helm/api/values-dev.yaml
+
+    steps:
+      - name: Checkout app repository
+        uses: actions/checkout@v4
+
+      - name: Set image tag
+        run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to ACR
+        run: az acr login --name $ACR_NAME
+
+      - name: Build and push API image
+        run: |
+          docker build -t $ACR_LOGIN_SERVER/$IMAGE_REPOSITORY:$IMAGE_TAG ./api
+          docker push $ACR_LOGIN_SERVER/$IMAGE_REPOSITORY:$IMAGE_TAG
+
+      - name: Checkout GitOps repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.GITOPS_REPO }}
+          token: ${{ secrets.GITOPS_PAT }}
+          path: gitops
+
+      - name: Update API image tag in GitOps
+        run: |
+          cd gitops
+          sed -i "s|repository: .*|repository: $ACR_LOGIN_SERVER/$IMAGE_REPOSITORY|" $GITOPS_VALUES_FILE
+          sed -i "s|tag: .*|tag: $IMAGE_TAG|" $GITOPS_VALUES_FILE
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add $GITOPS_VALUES_FILE
+          git commit -m "Update Azure API image tag to $IMAGE_TAG" || echo "No changes to commit"
+          git push
