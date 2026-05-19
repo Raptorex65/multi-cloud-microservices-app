@@ -1,6 +1,7 @@
 name: Build API and update GitOps
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
