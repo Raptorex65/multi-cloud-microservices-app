@@ -8,7 +8,7 @@ app.get("/", (req, res) => {
     service: "api",
     status: "ok",
     environment: process.env.APP_ENV || "local",
-    message: "Hello from the API service v2"
+    message: "Hello from the API service rollout v5"
   });
 });
 
