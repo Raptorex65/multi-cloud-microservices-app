@@ -15,7 +15,7 @@ env:
   ECR_REGISTRY: 075897120159.dkr.ecr.eu-west-1.amazonaws.com
   ECR_REPOSITORY: multi-cloud/api
   GITOPS_REPO: Raptorex65/multi-cloud-platform-gitops
-  GITOPS_VALUES_FILE: helm/api/values-dev.yaml
+  GITOPS_VALUES_FILE: helm/api/values-aws-dev.yaml
 
 jobs:
   build-and-update-gitops:

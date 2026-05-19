@@ -17,7 +17,7 @@ jobs:
       ACR_LOGIN_SERVER: multicloudplatformazuredevacr.azurecr.io
       IMAGE_REPOSITORY: multi-cloud/api
       GITOPS_REPO: Raptorex65/multi-cloud-platform-gitops
-      GITOPS_VALUES_FILE: helm/api/values-dev.yaml
+      GITOPS_VALUES_FILE: helm/api/values-azure-dev.yaml
 
     steps:
       - name: Checkout app repository
