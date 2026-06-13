@@ -63,6 +63,12 @@ app.get("/metrics", async (req, res) => {
   res.end(await client.register.metrics());
 });
 
+app.get("/error", (req,res)=>{
+    res.status(500).json({
+      error:"demo error"
+    })
+})
+
 app.listen(port, () => {
   console.log(`API service listening on port ${port}`);
 });
