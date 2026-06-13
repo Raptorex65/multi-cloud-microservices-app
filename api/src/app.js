@@ -47,8 +47,9 @@ app.get("/api", (req, res) => {
     service: "api",
     status: "ok",
     environment: process.env.APP_ENV || "local",
-    message: "Hello from the API service v4"
-  });
+    version: "v6",
+    message: "Hello from the API service with Prometheus metrics"
+    });
 });
 
 app.get("/api/health", (req, res) => {
