@@ -69,6 +69,10 @@ app.get("/error", (req,res)=>{
     })
 })
 
+app.get("/crash", (req,res)=>{
+   process.exit(1)
+})
+
 app.listen(port, () => {
   console.log(`API service listening on port ${port}`);
 });
