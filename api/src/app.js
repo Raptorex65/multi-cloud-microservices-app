@@ -73,6 +73,8 @@ app.get("/crash", (req,res)=>{
    process.exit(1)
 })
 
+console.log("analysis template test");
+
 app.listen(port, () => {
   console.log(`API service listening on port ${port}`);
 });
