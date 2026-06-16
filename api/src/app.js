@@ -74,6 +74,7 @@ app.get("/crash", (req,res)=>{
 })
 
 console.log("analysis template test");
+console.log("analysis template vector(0) added and bug resolved");
 
 app.listen(port, () => {
   console.log(`API service listening on port ${port}`);
